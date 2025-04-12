@@ -36,7 +36,7 @@ const Index = () => {
                   </Button>
                 </div>
               </div>
-              <div className="block -mt-[400px] md:-mt-0">
+              <div className="block -mt-[450px] md:-mt-0">
                 <div className="relative h-80 animate-float">
                   <PlaneTakeoff className="h-80 w-80 text-white/20 absolute" />
                 </div>
