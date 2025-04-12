@@ -8,7 +8,6 @@ import DetailCard from "@/components/DetailCard";
 import { airports, flights } from "@/data/mockData";
 
 const Index = () => {
-  // Take just a few recent flights for the showcase
   const recentFlights = flights.slice(0, 3);
 
   return (
@@ -32,12 +31,12 @@ const Index = () => {
                   <Button asChild size="lg" className="bg-white text-skyblue-700 hover:bg-gray-100">
                     <Link href="/flights">View Flights</Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  <Button asChild size="lg" variant="outline" className="border-white text-skyblue-700">
                     <Link href="/tickets/new">Book a Ticket</Link>
                   </Button>
                 </div>
               </div>
-              <div className="hidden md:block">
+              <div className="block -mt-[400px] md:-mt-0">
                 <div className="relative h-80 animate-float">
                   <PlaneTakeoff className="h-80 w-80 text-white/20 absolute" />
                 </div>

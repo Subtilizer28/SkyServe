@@ -65,3 +65,21 @@
     --ring: 212.7 26.8% 83.9%;
   }
 }
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.page-container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+.section-title {
+  @apply text-2xl font-bold text-navy-800 mb-6;
+}
