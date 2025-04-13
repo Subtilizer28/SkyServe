@@ -104,7 +104,7 @@ const TicketsPage = () => {
             </Button>
           </div>
           
-          <DataTable
+          <DataTable<Tickets>
             title="All Tickets"
             columns={columns}
             data={filteredTickets}

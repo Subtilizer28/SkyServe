@@ -55,8 +55,8 @@ export interface Tickets {
   passengerName?: string;
   route?: string;
   formattedBookingDate?: string;
-  departureAirport: string;
-  arrivalAirport: string;
+  departureAirport?: string;
+  arrivalAirport?: string; 
 }
 
 
