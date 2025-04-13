@@ -158,7 +158,7 @@ const PassengerDetailsPage = () => {
             </CardHeader>
             <CardContent>
               {enhancedTickets.length > 0 ? (
-                <DataTable 
+                <DataTable<Tickets>
                   title="" 
                   columns={ticketColumns} 
                   data={enhancedTickets} 

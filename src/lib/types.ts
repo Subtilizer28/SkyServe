@@ -49,12 +49,14 @@ export interface Tickets {
   seat: string;
   class: string;
   status: string;
-  // These are derived/formatted fields for display
   flightNumber: string;
-  passengerName: string;
-  route: string;
   departureTime: string;
   formattedPrice: string;
-  formattedBookingDate: string;
+  passengerName?: string;
+  route?: string;
+  formattedBookingDate?: string;
+  departureAirport: string;
+  arrivalAirport: string;
 }
+
 

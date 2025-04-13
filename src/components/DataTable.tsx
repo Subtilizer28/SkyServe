@@ -18,8 +18,7 @@ interface DataTableProps<T extends object> {
   idField?: keyof T;
 }
 
-// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-const DataTable = <T extends { [key: string]: unknown }>({
+const DataTable = <T extends object>({
   title,
   columns,
   data,
