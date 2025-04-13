@@ -19,7 +19,7 @@ import type { Flight, Controller } from "@/lib/types";
 
 const AirportDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const airport = getAirportById(id || "");
+  const airport = getAirportById(id ?? "");
   
   if (!airport) {
     return (
