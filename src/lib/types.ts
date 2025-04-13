@@ -30,3 +30,28 @@ export interface Airport {
   country: string;
   terminals: number;
 }
+
+export interface Passenger {
+  id: string;
+  name: string;
+  email: string;
+  nationality: string;
+  passportNumber: string;
+  contactNumber: string;
+}
+
+export interface Tickets {
+  flightNumber: string;
+  departureAirport: string;
+  arrivalAirport: string;
+  departureTime: string;
+  formattedPrice: string;
+  id: string;
+  flightId: string;
+  passengerId: string;
+  seat: string;
+  class: string;
+  bookingDate: string;
+  price: number;
+  status: string;
+}
