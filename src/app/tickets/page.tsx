@@ -91,7 +91,7 @@ const TicketsPage = () => {
                   <SelectValue placeholder="All Classes" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Classes</SelectItem>
+                  <SelectItem value="null">All Classes</SelectItem>
                   <SelectItem value="Economy">Economy</SelectItem>
                   <SelectItem value="Business">Business</SelectItem>
                   <SelectItem value="First">First</SelectItem>
