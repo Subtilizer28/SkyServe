@@ -41,17 +41,20 @@ export interface Passenger {
 }
 
 export interface Tickets {
-  flightNumber: string;
-  departureAirport: string;
-  arrivalAirport: string;
-  departureTime: string;
-  formattedPrice: string;
   id: string;
   flightId: string;
   passengerId: string;
-  seat: string;
-  class: string;
   bookingDate: string;
   price: number;
+  seat: string;
+  class: string;
   status: string;
+  // These are derived/formatted fields for display
+  flightNumber: string;
+  passengerName: string;
+  route: string;
+  departureTime: string;
+  formattedPrice: string;
+  formattedBookingDate: string;
 }
+
