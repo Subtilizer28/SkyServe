@@ -47,7 +47,7 @@ export interface Tickets {
   bookingDate: string;
   price: number;
   seat: string;
-  class: string;
+  class: "Economy" | "Business" | "First";
   status: string;
   flightNumber: string;
   departureTime: string;
