@@ -1,6 +1,11 @@
 import pool from "@/server/db";
 import type { Tickets } from "@/lib/types";
 
+export async function getAllTickets(): Promise<Tickets[]> {
+  const res = await pool.query<Tickets>('SELECT * FROM ticket');
+  return res.rows;
+}
+
 export const getTicketById = async (id: string) => {
   const result = await pool.query<Tickets>(
     "SELECT * FROM ticket WHERE id = $1",
