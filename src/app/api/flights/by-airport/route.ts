@@ -1,4 +1,3 @@
-// src/app/api/flights/by-airport/route.ts
 import { getFlightsByAirportCode } from "@/server/handlers/flight";
 import { NextResponse } from "next/server";
 
