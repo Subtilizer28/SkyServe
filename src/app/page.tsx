@@ -21,7 +21,7 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div className="animate-fade-in">
                 <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                  Aviation Management Made Simple
+                  Flight Management Made Simple
                 </h1>
                 <p className="text-xl mb-8">
                   SkyServe provides comprehensive solutions for airlines, airports, and passengers.
