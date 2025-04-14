@@ -2,11 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getAirportById } from '@/server/handlers/airport';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const id = Number(params.id);
-
-  if (isNaN(id)) {
-    return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
-  }
+  const id = params.id;
 
   const airport = await getAirportById(id);
 
