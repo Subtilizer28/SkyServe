@@ -1,7 +1,7 @@
 import pool from '@/server/db';
 import type { Passenger } from '@/lib/types';
 
-export async function getAllAirports(): Promise<Passenger[]> {
+export async function getAllPassengers(): Promise<Passenger[]> {
   const res = await pool.query<Passenger>('SELECT * FROM passenger');
   return res.rows;
 }
