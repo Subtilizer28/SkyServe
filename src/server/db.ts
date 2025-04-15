@@ -8,9 +8,7 @@ if (!connectionString) {
 
 const pool = new Pool({
     connectionString,
-    ssl: {
-        rejectUnauthorized: false, 
-    },
+    ssl: false,
 });
 
 export const query = async (text: string, params?: Array<string | number | null>) => {
