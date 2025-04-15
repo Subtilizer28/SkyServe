@@ -15,7 +15,7 @@ export async function getFlightById(id: string) {
 
 export const getFlightsByAirportCode = async (code: string) => {
   const result = await pool.query<Flight>(
-    `SELECT * FROM flight WHERE departure_airport = $1 OR arrival_airport = $1`,
+    `SELECT * FROM flight WHERE departureairport = $1 OR arrivalairport = $1`,
     [code],
   );
   return result.rows;
@@ -23,7 +23,7 @@ export const getFlightsByAirportCode = async (code: string) => {
 
 export const getFlightsByController = async (controllerId: string) => {
   const result = await pool.query<Flight>(
-    `SELECT * FROM flight WHERE assigned_controller = $1`,
+    `SELECT * FROM flight WHERE assignedcontroller = $1`,
     [controllerId],
   );
   return result.rows;
