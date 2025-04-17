@@ -16,7 +16,7 @@ CREATE TABLE
         airportcode VARCHAR(10),
         contactnumber VARCHAR(15),
         email VARCHAR(50),
-        FOREIGN KEY (airportcode) REFERENCES Airport (code)
+        FOREIGN KEY (airportcode) REFERENCES Airport (code) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 CREATE TABLE
@@ -33,9 +33,9 @@ CREATE TABLE
         gate VARCHAR(10),
         terminal VARCHAR(10),
         assignedcontroller VARCHAR(10),
-        FOREIGN KEY (departureairport) REFERENCES Airport (code),
-        FOREIGN KEY (arrivalairport) REFERENCES Airport (code),
-        FOREIGN KEY (assignedcontroller) REFERENCES Controller (id)
+        FOREIGN KEY (departureairport) REFERENCES Airport (code) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (arrivalairport) REFERENCES Airport (code) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (assignedcontroller) REFERENCES Controller (id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 CREATE TABLE
@@ -59,7 +59,7 @@ CREATE TABLE
         class VARCHAR(10),
         status VARCHAR(20),
         FOREIGN KEY (flightid) REFERENCES Flight (id),
-        FOREIGN KEY (passengerpassportnumber) REFERENCES Passenger (passportnumber)
+        FOREIGN KEY (passengerpassportnumber) REFERENCES Passenger (passportnumber) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 INSERT INTO
