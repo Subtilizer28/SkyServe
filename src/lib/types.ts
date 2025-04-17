@@ -1,24 +1,24 @@
 export interface Flight {
   id: string;
-  flightNumber: string;
+  flightnumber: string;
   airline: string;
-  departureAirport: string;
-  arrivalAirport: string;
-  departureTime: string;
-  arrivalTime: string;
+  departureairport: string;
+  arrivalairport: string;
+  departuretime: string;
+  arrivaltime: string;
   status: string;
   aircraft: string;
   gate: string;
   terminal: string;
-  assignedController: string;
+  assignedcontroller: string;
 }
 
 export interface Controller {
   id: string;
   name: string;
   position: string;
-  airports: string[];
-  contactNumber: string;
+  airportcode: string;
+  contactnumber: string;
   email: string;
 }
 
@@ -36,27 +36,19 @@ export interface Passenger {
   name: string;
   email: string;
   nationality: string;
-  passportNumber: string;
-  contactNumber: string;
+  passportnumber: string;
+  contactnumber: string;
 }
 
 export interface Tickets {
   id: string;
-  flightId: string;
-  passengerId: string;
-  bookingDate: string;
+  flightid: string;
+  passengerpassportnumber: string;
+  bookingdate: string;
   price: number;
   seat: string;
   class: "Economy" | "Business" | "First";
   status: string;
-  flightNumber: string;
-  departureTime: string;
-  formattedPrice: string;
-  passengerName?: string;
-  route?: string;
-  formattedBookingDate?: string;
-  departureAirport?: string;
-  arrivalAirport?: string; 
 }
 
 
