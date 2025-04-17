@@ -50,7 +50,7 @@ CREATE TABLE
 
 CREATE TABLE
     Tickets (
-        id VARCHAR(10) PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         flightid VARCHAR(10),
         passengerpassportnumber VARCHAR(15),
         bookingdate VARCHAR(25),
@@ -787,7 +787,6 @@ VALUES
 
 INSERT INTO
     Tickets (
-        id,
         flightid,
         passengerpassportnumber,
         bookingdate,
@@ -798,7 +797,6 @@ INSERT INTO
     )
 VALUES
     (
-        'T001',
         'FL011',
         'IN4026985',
         '2025-04-12 05:02:50',
@@ -808,7 +806,6 @@ VALUES
         'Pending'
     ),
     (
-        'T002',
         'FL018',
         'IN9292879',
         '2025-04-07 23:22:18',
@@ -818,7 +815,6 @@ VALUES
         'Cancelled'
     ),
     (
-        'T003',
         'FL011',
         'IN1028505',
         '2025-04-08 01:58:53',
@@ -828,7 +824,6 @@ VALUES
         'Pending'
     ),
     (
-        'T004',
         'FL002',
         'IN9682796',
         '2025-04-12 06:24:19',
@@ -838,7 +833,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T005',
         'FL008',
         'IN7028949',
         '2025-04-12 08:18:54',
@@ -848,7 +842,6 @@ VALUES
         'Cancelled'
     ),
     (
-        'T006',
         'FL012',
         'IN7186059',
         '2025-04-11 07:34:55',
@@ -858,7 +851,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T007',
         'FL019',
         'IN8735833',
         '2025-04-16 09:59:38',
@@ -868,7 +860,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T008',
         'FL014',
         'IN8735833',
         '2025-04-13 12:24:23',
@@ -878,7 +869,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T009',
         'FL008',
         'IN7186059',
         '2025-04-16 03:33:07',
@@ -888,7 +878,6 @@ VALUES
         'Cancelled'
     ),
     (
-        'T010',
         'FL005',
         'IN8599016',
         '2025-04-08 16:06:59',
@@ -898,7 +887,6 @@ VALUES
         'Cancelled'
     ),
     (
-        'T011',
         'FL016',
         'IN8735833',
         '2025-04-10 08:50:47',
@@ -908,7 +896,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T012',
         'FL018',
         'IN4827367',
         '2025-04-07 18:43:28',
@@ -918,7 +905,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T013',
         'FL006',
         'IN6032173',
         '2025-04-08 20:51:20',
@@ -928,7 +914,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T014',
         'FL017',
         'IN8735833',
         '2025-04-08 06:04:14',
@@ -938,7 +923,6 @@ VALUES
         'Cancelled'
     ),
     (
-        'T015',
         'FL011',
         'IN9253772',
         '2025-04-14 16:34:06',
@@ -948,7 +932,6 @@ VALUES
         'Cancelled'
     ),
     (
-        'T016',
         'FL015',
         'IN9292879',
         '2025-04-15 14:24:12',
@@ -958,7 +941,6 @@ VALUES
         'Cancelled'
     ),
     (
-        'T017',
         'FL004',
         'IN7140490',
         '2025-04-09 02:24:07',
@@ -968,7 +950,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T018',
         'FL001',
         'IN5841004',
         '2025-04-14 14:53:02',
@@ -978,7 +959,6 @@ VALUES
         'Cancelled'
     ),
     (
-        'T019',
         'FL004',
         'IN9494669',
         '2025-04-14 23:10:20',
@@ -988,7 +968,6 @@ VALUES
         'Confirmed'
     ),
     (
-        'T020',
         'FL008',
         'IN9682796',
         '2025-04-13 12:27:52',
