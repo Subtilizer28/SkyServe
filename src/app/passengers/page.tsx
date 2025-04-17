@@ -1,25 +1,39 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHeader from "@/components/PageHeader";
 import DataTable from "@/components/DataTable";
-import { passengers } from "@/data/mockData";
 import { Search } from "lucide-react";
 import type { Passenger } from "@/lib/types";
 
 const PassengersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [passengers, setPassengers] = useState<Passenger[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const passengerRes = await axios.get<Passenger[]>("/api/passengers");
+        setPassengers(passengerRes.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    void fetchData();
+  }, []);
   
   const filteredPassengers = passengers.filter((passenger) => {
     const searchValue = searchTerm.toLowerCase();
     return (
-      passenger.name.toLowerCase().includes(searchValue) ||
-      passenger.email.toLowerCase().includes(searchValue) ||
-      passenger.nationality.toLowerCase().includes(searchValue) ||
-      passenger.passportNumber.toLowerCase().includes(searchValue)
+      passenger.name.toLowerCase().includes(searchValue) ??
+      passenger.email.toLowerCase().includes(searchValue) ??
+      passenger.nationality.toLowerCase().includes(searchValue) ??
+      passenger.passportnumber.toLowerCase().includes(searchValue)
     );
   });
   
@@ -27,8 +41,8 @@ const PassengersPage = () => {
     { key: "name", title: "Name" },
     { key: "email", title: "Email" },
     { key: "nationality", title: "Nationality" },
-    { key: "passportNumber", title: "Passport" },
-    { key: "contactNumber", title: "Contact" },
+    { key: "passportnumber", title: "Passport" },
+    { key: "contactnumber", title: "Contact" },
   ];
   
   return (
@@ -64,6 +78,8 @@ const PassengersPage = () => {
             columns={columns}
             data={filteredPassengers}
             linkPath="/passengers"
+            tableName="Passenger"
+            idField="id"
           />
         </div>
       </main>

@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -11,18 +12,42 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHeader from "@/components/PageHeader";
 import { PlaneTakeoff, User, CreditCard, Armchair } from "lucide-react";
-import { flights, passengers, tickets, formatDate } from "@/data/mockData";
+import { formatDate } from "@/lib/format";
+import type { Flight, Passenger } from "@/lib/types";
 
 const BookTicketPage = () => {
-  const navigate = useRouter();
+  const router = useRouter();
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const [passengers, setPassengers] = useState<Passenger[]>([]);
   const [selectedFlightId, setSelectedFlightId] = useState("");
   const [selectedPassengerId, setSelectedPassengerId] = useState("");
   const [seatClass, setSeatClass] = useState("Economy");
   const [seatNumber, setSeatNumber] = useState("");
   
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      const [flightsRes, passengersRes] = await Promise.all([
+        axios.get<Flight[]>("/api/flights"),
+        axios.get<Passenger[]>("/api/passengers"),
+      ]);
+      setFlights(flightsRes.data);
+      setPassengers(passengersRes.data);
+    };
+    void fetchData();
+  }, []);
+
+  const getBasePrice = () => {
+    switch (seatClass) {
+      case "Economy": return 6250;
+      case "Business": return 25400;
+      case "First": return 56000;
+      default: return 0;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedFlightId || !selectedPassengerId || !seatClass || !seatNumber) {
       toast({
         title: "Error",
@@ -31,22 +56,35 @@ const BookTicketPage = () => {
       });
       return;
     }
-    
-    // In a real app, this would be an API call to create a new ticket
-    const newTicketId = String(tickets.length + 1);
-    
-    toast({
-      title: "Success!",
-      description: "Ticket has been booked successfully",
-    });
-    
-    // Redirect to ticket details page
-    setTimeout(() => {
-      navigate.push(`/tickets/${newTicketId}`);
-    }, 1500);
+
+    const price = getBasePrice() + 85;
+
+    try {
+      const res = await axios.post("/api/tickets/new", {
+        passengerId: selectedPassengerId,
+        flightId: selectedFlightId,
+        seat: seatNumber,
+        bookingDate: new Date().toISOString(),
+        class: seatClass,
+        status: "Confirmed",
+        price,
+      });
+
+      toast({ title: "Success", description: "Ticket booked successfully!" });
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      router.push(`/tickets/${res.data.id}`);
+    } catch (err) {
+      console.error("Booking failed:", err);
+      toast({
+        title: "Booking Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
-  
-  const selectedFlight = flights.find(flight => flight.id === selectedFlightId);
+
+  const selectedFlight = flights.find((f) => f.id === selectedFlightId);
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -83,7 +121,7 @@ const BookTicketPage = () => {
                         <SelectContent>
                           {flights.map((flight) => (
                             <SelectItem key={flight.id} value={flight.id}>
-                              {`${flight.flightNumber} - ${flight.departureAirport} to ${flight.arrivalAirport} (${formatDate(flight.departureTime)})`}
+                              {`${flight.flightnumber} - ${flight.departureairport} to ${flight.arrivalairport} (${formatDate(flight.departuretime)})`}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -100,8 +138,8 @@ const BookTicketPage = () => {
                         </SelectTrigger>
                         <SelectContent>
                           {passengers.map((passenger) => (
-                            <SelectItem key={passenger.id} value={passenger.id}>
-                              {passenger.name} - {passenger.passportNumber}
+                            <SelectItem key={passenger.passportnumber} value={passenger.passportnumber}>
+                              {passenger.name} - {passenger.passportnumber}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -161,9 +199,9 @@ const BookTicketPage = () => {
                           <PlaneTakeoff className="h-5 w-5 text-skyblue-600 mr-3 mt-0.5" />
                           <div>
                             <div className="text-sm text-gray-500">Flight</div>
-                            <div className="font-medium">{selectedFlight?.flightNumber}</div>
-                            <div className="text-sm">{selectedFlight?.departureAirport} → {selectedFlight?.arrivalAirport}</div>
-                            <div className="text-sm">{formatDate(selectedFlight?.departureTime ?? "")}</div>
+                            <div className="font-medium">{selectedFlight?.flightnumber}</div>
+                            <div className="text-sm">{selectedFlight?.departureairport} → {selectedFlight?.arrivalairport}</div>
+                            <div className="text-sm">{formatDate(selectedFlight?.departuretime ?? "")}</div>
                           </div>
                         </div>
                         
@@ -173,7 +211,7 @@ const BookTicketPage = () => {
                             <div>
                               <div className="text-sm text-gray-500">Passenger</div>
                               <div className="font-medium">
-                                {passengers.find(p => p.id === selectedPassengerId)?.name}
+                                {passengers.find(p => p.passportnumber === selectedPassengerId)?.name}
                               </div>
                             </div>
                           </div>

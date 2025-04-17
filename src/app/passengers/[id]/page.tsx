@@ -1,4 +1,6 @@
 "use client";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -8,18 +10,68 @@ import Footer from "@/components/Footer";
 import PageHeader from "@/components/PageHeader";
 import DataTable from "@/components/DataTable";
 import { User, Phone, Mail, Flag, Ticket, CreditCard } from "lucide-react";
-import {
-  getPassengerById,
-  getTicketsByPassenger,
-  getFlightById,
-  formatDate,
-  formatCurrency,
-} from "@/data/mockData";
-import type { Tickets } from "@/lib/types";
+import type { Tickets, Passenger } from "@/lib/types";
+import { formatDate } from "@/lib/format";
 
 const PassengerDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const passenger = getPassengerById(id || "");
+  const [passenger, setPassenger] = useState<Passenger | null>(null);
+  const [tickets, setTickets] = useState<Tickets[]>([]);
+  const [enhancedTickets, setEnhancedTickets] = useState<Tickets[]>([]);
+
+  useEffect(() => {
+    const fetchPassengerAndTickets = async () => {
+      try {
+        const resPassenger = await axios.get<Passenger>(`/api/passengers/${id}`);
+        setPassenger(resPassenger.data);
+        const resTickets = await axios.get<Tickets[]>(`/api/tickets/by-passenger/${passenger?.passportnumber}`);
+        setTickets(resTickets.data);
+      } catch (error) {
+        console.error(error);
+        setPassenger(null);
+        setTickets([]);
+      } finally {
+        console.log("Fetching completed");
+      }
+    };
+
+    if (id) {
+      void fetchPassengerAndTickets();
+    }
+  }, [id, passenger?.passportnumber]);
+
+  useEffect(() => {
+    const enhanceTickets = async () => {
+      if (tickets.length === 0) return;
+
+      try {
+        const results = await Promise.all(
+          tickets.map(async (ticket) => {
+            const resFlight = await fetch(`/api/flights/${ticket.flightid}`);
+            if (!resFlight.ok) {
+              return
+            }
+
+            return {
+              ...ticket,
+              flightid: ticket?.flightid ?? 'N/A',
+              passengerpassportnumber: ticket?.passengerpassportnumber ?? 'N/A',
+              bookingdate: ticket?.bookingdate ?? 'N/A',
+              class: ticket?.class ? formatDate(ticket.class) : 'N/A',
+              seat: ticket?.seat ?? 'N/A',
+              status: ticket?.status ?? 'N/A',
+              price: ticket?.price ?? 'N/A',
+            };
+          })
+        );
+        setEnhancedTickets(results.filter((ticket): ticket is Tickets => ticket !== undefined));
+      } catch (error) {
+        console.error("Error enhancing tickets", error);
+      }
+    };
+
+    void enhanceTickets();
+  }, [tickets]);
   
   if (!passenger) {
     return (
@@ -39,29 +91,13 @@ const PassengerDetailsPage = () => {
     );
   }
   
-  const tickets = getTicketsByPassenger(passenger.id);
-  
-  // Enhance tickets with flight information
-  const enhancedTickets = tickets.map(ticket => {
-    const flight = getFlightById(ticket.flightId);
-    return {
-      ...ticket,
-      flightNumber: flight?.flightNumber ?? 'N/A',
-      departureAirport: flight?.departureAirport ?? 'N/A',
-      arrivalAirport: flight?.arrivalAirport ?? 'N/A',
-      departureTime: flight ? formatDate(flight.departureTime) : 'N/A',
-      formattedPrice: formatCurrency(ticket.price),
-    };
-  });
-  
   // Columns for ticket table
   const ticketColumns: { key: keyof Tickets; title: string }[] = [
-    { key: "flightNumber", title: "Flight" },
-    { key: "departureAirport", title: "From" },
-    { key: "arrivalAirport", title: "To" },
+    { key: "flightid", title: "Flight" },
+    { key: "passengerpassportnumber", title: "Passenger Passport Number" },
+    { key: "bookingdate", title: "Booking Date" },
     { key: "seat", title: "Seat" },
     { key: "class", title: "Class" },
-    { key: "formattedPrice", title: "Price" },
     { key: "status", title: "Status" },
   ];
   
@@ -116,7 +152,7 @@ const PassengerDetailsPage = () => {
                         <Phone className="h-5 w-5 text-gray-500 mr-3" />
                         <div>
                           <div className="text-sm text-gray-500">Phone</div>
-                          <div className="font-medium">{passenger.contactNumber}</div>
+                          <div className="font-medium">{passenger.contactnumber}</div>
                         </div>
                       </div>
                     </div>
@@ -135,7 +171,7 @@ const PassengerDetailsPage = () => {
                       <CreditCard className="h-5 w-5 text-gray-500 mr-3" />
                       <div>
                         <div className="text-sm text-gray-500">Passport Number</div>
-                        <div className="font-medium">{passenger.passportNumber}</div>
+                        <div className="font-medium">{passenger.passportnumber}</div>
                       </div>
                     </div>
                     
@@ -163,6 +199,8 @@ const PassengerDetailsPage = () => {
                   columns={ticketColumns} 
                   data={enhancedTickets} 
                   linkPath="/tickets" 
+                  tableName="Ticket"
+                  idField="id"
                 />
               ) : (
                 <div className="text-center py-8 text-gray-500">

@@ -1,17 +1,32 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHeader from "@/components/PageHeader";
 import DataTable from "@/components/DataTable";
-import { controllers } from "@/data/mockData";
 import { Search } from "lucide-react";
 import type { Controller } from "@/lib/types";
 
 const ControllersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [controllers, setControllers] = useState<Controller[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const controllerRes = await axios.get<Controller[]>("/api/controllers");
+        setControllers(controllerRes.data);
+        console.log(controllerRes.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    void fetchData();
+  }, []);
   
   const filteredControllers = controllers.filter((controller) => {
     const searchValue = searchTerm.toLowerCase();
@@ -19,23 +34,17 @@ const ControllersPage = () => {
       controller.name.toLowerCase().includes(searchValue) ||
       controller.position.toLowerCase().includes(searchValue) ||
       controller.email.toLowerCase().includes(searchValue) ||
-      controller.airports.some(code => code.toLowerCase().includes(searchValue))
+      controller.airportcode.toLowerCase().includes(searchValue)
     );
   });
   
   const columns: { key: keyof Controller; title: string }[] = [
     { key: "name", title: "Name" },
     { key: "position", title: "Position" },
-    { key: "airports", title: "Airports" },
-    { key: "contactNumber", title: "Contact" },
+    { key: "airportcode", title: "Airports" },
+    { key: "contactnumber", title: "Contact" },
     { key: "email", title: "Email" },
   ];
-  
-  // Format the data to display airports as a comma-separated string
-  const formattedData = filteredControllers.map(controller => ({
-    ...controller,
-    airports: controller.airports.join(", ")
-  }));
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -68,8 +77,10 @@ const ControllersPage = () => {
           <DataTable
             title="All Controllers"
             columns={columns}
-            data={formattedData}
+            data={filteredControllers}
             linkPath="/controllers"
+            tableName="Controller"
+            idField="id"
           />
         </div>
       </main>

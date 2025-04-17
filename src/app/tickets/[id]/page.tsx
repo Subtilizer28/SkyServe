@@ -1,4 +1,6 @@
 "use client";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,18 +10,49 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHeader from "@/components/PageHeader";
 import { Calendar, User, Clock, PlaneTakeoff, PlaneLanding } from "lucide-react";
-import {
-  getTicketById,
-  getFlightById,
-  getPassengerById,
-  getAirportByCode,
-  formatDate,
-  formatCurrency,
-} from "@/data/mockData";
+import { formatDate, formatCurrency } from "@/lib/format";
+import type { Tickets, Flight, Airport, Passenger } from "@/lib/types";
 
 const TicketDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const ticket = getTicketById(id || "");
+  const [ticket, setTicket] = useState<Tickets | null>(null);
+  const [flight, setFlight] = useState<Flight | null>(null);
+  const [passenger, setPassenger] = useState<Passenger | null>(null);
+  const [departureAirport, setDepartureAirport] = useState<Airport | null>(null);
+  const [arrivalAirport, setArrivalAirport] = useState<Airport | null>(null);
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        if (!id) return;
+
+        const ticketData = await axios.get<Tickets>(`/api/tickets/${id}`);
+        setTicket(ticketData.data);
+
+        const [ flightData , passengerData ] = await Promise.all([
+          axios.get<Flight>(`/api/flights/${ticketData.data.flightid}`),
+          axios.get<Passenger>(`/api/passengers/by-pnumber/${ticketData.data.passengerpassportnumber}`),
+        ]);
+
+        setFlight(flightData.data);
+        setPassenger(passengerData.data);
+
+        const [ departureData , arrivalData ] = await Promise.all([
+          axios.get<Airport>(`/api/airports/by-code/${flightData.data.departureairport}`),
+          axios.get<Airport>(`/api/airports/by-code/${flightData.data.arrivalairport}`),
+        ]);
+
+        setDepartureAirport(departureData.data);
+        setArrivalAirport(arrivalData.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        console.log("Ticket details fetched successfully");
+      }
+    };
+
+    void fetchDetails();
+  }, [id]);
   
   if (!ticket) {
     return (
@@ -39,9 +72,6 @@ const TicketDetailsPage = () => {
     );
   }
   
-  const flight = getFlightById(ticket.flightId);
-  const passenger = getPassengerById(ticket.passengerId);
-  
   if (!flight || !passenger) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -60,12 +90,9 @@ const TicketDetailsPage = () => {
     );
   }
   
-  const departureAirport = getAirportByCode(flight.departureAirport);
-  const arrivalAirport = getAirportByCode(flight.arrivalAirport);
-  
   // Calculate flight duration
-  const departureTime = new Date(flight.departureTime);
-  const arrivalTime = new Date(flight.arrivalTime);
+  const departureTime = new Date(flight.departuretime);
+  const arrivalTime = new Date(flight.arrivaltime);
   const durationMs = arrivalTime.getTime() - departureTime.getTime();
   const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
   const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -78,7 +105,7 @@ const TicketDetailsPage = () => {
         <div className="page-container">
           <PageHeader 
             title={`Ticket #${ticket.id}`}
-            description={`Flight ${flight.flightNumber} • ${formatDate(flight.departureTime)}`}
+            description={`Flight ${flight.flightnumber} • ${formatDate(flight.departuretime)}`}
             actions={
               <div className="flex gap-4">
                 <Button asChild variant="outline">
@@ -97,7 +124,7 @@ const TicketDetailsPage = () => {
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-2xl font-bold">{flight.airline}</h3>
-                    <p className="text-skyblue-100">Flight {flight.flightNumber}</p>
+                    <p className="text-skyblue-100">Flight {flight.flightnumber}</p>
                   </div>
                   <div className="text-right">
                     <div className="text-xl font-bold">{ticket.class} Class</div>
@@ -115,7 +142,7 @@ const TicketDetailsPage = () => {
                         <User className="h-5 w-5 text-gray-500 mr-2" />
                         <div>
                           <div className="font-medium">{passenger.name}</div>
-                          <div className="text-sm text-gray-500">{passenger.passportNumber}</div>
+                          <div className="text-sm text-gray-500">{passenger.passportnumber}</div>
                         </div>
                       </div>
                     </div>
@@ -125,7 +152,7 @@ const TicketDetailsPage = () => {
                       <div className="flex items-start">
                         <Calendar className="h-5 w-5 text-gray-500 mr-2" />
                         <div>
-                          <div className="font-medium">Booked on {formatDate(ticket.bookingDate)}</div>
+                          <div className="font-medium">Booked on {formatDate(ticket.bookingdate)}</div>
                           <div className="text-sm text-gray-500">Price: {formatCurrency(ticket.price)}</div>
                         </div>
                       </div>
@@ -148,7 +175,7 @@ const TicketDetailsPage = () => {
                       <div className="flex items-start">
                         <Clock className="h-5 w-5 text-gray-500 mr-2" />
                         <div>
-                          <div className="font-medium">{formatDate(flight.departureTime)}</div>
+                          <div className="font-medium">{formatDate(flight.departuretime)}</div>
                           <div className="text-sm text-gray-500">Terminal {flight.terminal}, Gate {flight.gate}</div>
                         </div>
                       </div>
@@ -175,7 +202,7 @@ const TicketDetailsPage = () => {
                       <div className="flex items-start">
                         <Clock className="h-5 w-5 text-gray-500 mr-2" />
                         <div>
-                          <div className="font-medium">{formatDate(flight.arrivalTime)}</div>
+                          <div className="font-medium">{formatDate(flight.arrivaltime)}</div>
                         </div>
                       </div>
                     </div>

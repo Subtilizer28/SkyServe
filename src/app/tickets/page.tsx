@@ -1,68 +1,121 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageHeader from "@/components/PageHeader";
 import DataTable from "@/components/DataTable";
-import { tickets, getFlightById, getPassengerById, formatCurrency, formatDate } from "@/data/mockData";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { Search, PlusCircle } from "lucide-react";
-import { type Tickets } from "@/lib/types";
+import { type Flight, type Passenger, type Tickets } from "@/lib/types";
 
 const TicketsPage = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [tickets, setTickets] = useState<Tickets[]>([]);
+  const [enhancedTickets, setEnhancedTickets] = useState<Tickets[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [classFilter, setClassFilter] = useState("");
-  
-  // Enhance tickets with flight and passenger information
-  const enhancedTickets = tickets.map(ticket => {
-    const flight = getFlightById(ticket.flightId);
-    const passenger = getPassengerById(ticket.passengerId);
-    
-    return {
-      ...ticket,
-      flightNumber: flight?.flightNumber ?? 'N/A',
-      passengerName: passenger?.name ?? 'N/A',
-      route: flight ? `${flight.departureAirport} → ${flight.arrivalAirport}` : 'N/A',
-      departureTime: flight ? formatDate(flight.departureTime) : 'N/A',
-      formattedPrice: formatCurrency(ticket.price),
-      formattedBookingDate: formatDate(ticket.bookingDate),
+
+  // Helper to enhance ticket with extra info
+  const enhanceTickets = async (rawTickets: Tickets[]): Promise<Tickets[]> => {
+    return Promise.all(
+      rawTickets.map(async (ticket) => {
+        try {
+          const [flightRes, passengerRes] = await Promise.all([
+            axios.get<Flight>(`/api/flights/${ticket.flightid}`),
+            axios.get<Passenger>(
+              `/api/passengers/by-pnumber/${ticket.passengerpassportnumber}`,
+            ),
+          ]);
+
+          const flight = flightRes.data;
+          const passenger = passengerRes.data;
+
+          return {
+            ...ticket,
+            flightNumber: flight?.flightnumber ?? "N/A",
+            passengerName: passenger?.name ?? "N/A",
+            route: `${flight?.departureairport} → ${flight?.arrivalairport}`,
+            departureTime: formatDate(flight?.departuretime),
+            formattedPrice: formatCurrency(ticket.price),
+            formattedBookingDate: formatDate(ticket.bookingdate),
+          };
+        } catch (err) {
+          console.error("Error enhancing ticket", err);
+          return {
+            ...ticket,
+            flightNumber: "N/A",
+            passengerName: "N/A",
+            route: "N/A",
+            departureTime: "N/A",
+            formattedPrice: formatCurrency(ticket.price),
+            formattedBookingDate: formatDate(ticket.bookingdate),
+          };
+        }
+      }),
+    );
+  };
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const res = await axios.get<Tickets[]>("/api/tickets");
+        const rawTickets = res.data;
+        setTickets(rawTickets);
+        console.log("Tickets fetched:", rawTickets);
+
+        const enhanced = await enhanceTickets(rawTickets);
+        setEnhancedTickets(enhanced);
+      } catch (err) {
+        console.error("Error fetching tickets", err);
+      }
     };
-  });
-  
+
+    void fetchTickets();
+  }, []);
+
   const filteredTickets = enhancedTickets.filter((ticket) => {
     const searchValue = searchTerm.toLowerCase();
-    const matchesSearch = 
-      ticket.flightNumber.toLowerCase().includes(searchValue) ||
-      ticket.passengerName.toLowerCase().includes(searchValue) ||
-      ticket.route.toLowerCase().includes(searchValue) ||
-      ticket.seat.toLowerCase().includes(searchValue);
-    
+
+    const matchesSearch = [
+      ticket.flightid,
+      ticket.passengerpassportnumber,
+      ticket.class,
+      ticket.seat,
+    ].some((field) => field?.toLowerCase().includes(searchValue));
+
     const matchesClass = classFilter === "" || ticket.class === classFilter;
-    
+
     return matchesSearch && matchesClass;
   });
-  
+
   const columns: { key: keyof Tickets; title: string }[] = [
-    { key: "flightNumber", title: "Flight" },
-    { key: "passengerName", title: "Passenger" },
-    { key: "route", title: "Route" },
-    { key: "seat", title: "Seat" },
+    { key: "flightid", title: "Flight" },
+    { key: "passengerpassportnumber", title: "Passenger" },
     { key: "class", title: "Class" },
-    { key: "formattedPrice", title: "Price" },
+    { key: "seat", title: "Seat" },
+    { key: "price", title: "Price" },
     { key: "status", title: "Status" },
   ];
-  
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <Navbar />
-      
+
       <main className="flex-grow">
         <div className="page-container">
-          <PageHeader 
-            title="Tickets" 
+          <PageHeader
+            title="Tickets"
             description="View all booked tickets in the system"
             actions={
               <Button asChild>
@@ -72,8 +125,8 @@ const TicketsPage = () => {
               </Button>
             }
           />
-          
-          <div className="mb-6 flex flex-col sm:flex-row gap-4">
+
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row">
             <div className="relative flex-grow">
               <Input
                 type="text"
@@ -84,7 +137,7 @@ const TicketsPage = () => {
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>
-            
+
             <div className="w-full sm:w-48">
               <Select value={classFilter} onValueChange={setClassFilter}>
                 <SelectTrigger>
@@ -98,21 +151,29 @@ const TicketsPage = () => {
                 </SelectContent>
               </Select>
             </div>
-            
-            <Button onClick={() => { setSearchTerm(""); setClassFilter(""); }} variant="outline">
+
+            <Button
+              onClick={() => {
+                setSearchTerm("");
+                setClassFilter("");
+              }}
+              variant="outline"
+            >
               Reset
             </Button>
           </div>
-          
+
           <DataTable<Tickets>
             title="All Tickets"
             columns={columns}
             data={filteredTickets}
             linkPath="/tickets"
+            tableName="Tickets"
+            idField="id"
           />
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

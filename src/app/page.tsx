@@ -1,14 +1,33 @@
 "use client";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Link from "next/link";
 import { PlaneTakeoff, MapPin, Ticket, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DetailCard from "@/components/DetailCard";
-import { airports, flights } from "@/data/mockData";
+import type { Flight, Airport } from "@/lib/types";
 
 const Index = () => {
-  const recentFlights = flights.slice(0, 3);
+  const [airports, setAirports] = useState<Airport[]>([]);
+  const [recentFlights, setRecentFlights] = useState<Flight[]>([]);
+  console.log(recentFlights)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const flightRes = await axios.get<Flight[]>("/api/flights");
+        setRecentFlights(flightRes.data.slice(0, 3));
+        const airportsRes = await axios.get<Airport[]>("/api/airports");
+        setAirports(airportsRes.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    void fetchData();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -116,11 +135,12 @@ const Index = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {recentFlights.map((flight) => (
-                <DetailCard key={flight.id} title={`Flight ${flight.flightNumber}`} className="h-full">
+                console.log(flight),
+                <DetailCard key={flight.id} title={`Flight ${flight.flightnumber}`} className="h-full">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <MapPin className="h-4 w-4 text-gray-500 mr-1" />
-                      <span className="text-sm text-gray-500">{flight.departureAirport} → {flight.arrivalAirport}</span>
+                      <span className="text-sm text-gray-500">{flight.departureairport} → {flight.arrivalairport}</span>
                     </div>
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       flight.status === 'Scheduled' ? 'bg-blue-100 text-blue-800' :
@@ -135,14 +155,14 @@ const Index = () => {
                   
                   <div className="mb-4">
                     <div className="text-sm text-gray-500">Departure</div>
-                    <div className="font-medium">{new Date(flight.departureTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                    <div className="text-sm">{new Date(flight.departureTime).toLocaleDateString()}</div>
+                    <div className="font-medium">{new Date(flight.departuretime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    <div className="text-sm">{new Date(flight.departuretime).toLocaleDateString()}</div>
                   </div>
                   
                   <div className="mb-4">
                     <div className="text-sm text-gray-500">Arrival</div>
-                    <div className="font-medium">{new Date(flight.arrivalTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                    <div className="text-sm">{new Date(flight.arrivalTime).toLocaleDateString()}</div>
+                    <div className="font-medium">{new Date(flight.arrivaltime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    <div className="text-sm">{new Date(flight.arrivaltime).toLocaleDateString()}</div>
                   </div>
                   
                   <Button asChild variant="default" className="w-full mt-2 bg-skyblue-600 hover:bg-skyblue-700">
