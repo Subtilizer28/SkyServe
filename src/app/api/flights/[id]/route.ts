@@ -2,10 +2,10 @@ import { getFlightById } from "@/server/handlers/flight";
 import { NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
-  context: { params: { id: string } }
+  _req: Request,
+  { params }: { params: { id: string } }
 ) {
-  const { id } = context.params;
+  const id = params.id;
 
   if (!id) {
     return NextResponse.json({ error: "Flight ID is required" }, { status: 400 });
