@@ -1,9 +1,11 @@
 import { getControllerById } from "@/server/handlers/controller";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+export async function GET(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
 
   if (!id) {
     return NextResponse.json({ error: "Controller ID is required" }, { status: 400 });

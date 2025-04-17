@@ -6,10 +6,11 @@ export async function GET() {
     const airports = await getAllAirports();
     return NextResponse.json(airports);
   } catch (error) {
-    console.error(error);
+    console.error("Error in GET /api/airports:", error);
     return NextResponse.json(
-      { error: "Failed to fetch airports" },
-      { status: 500 },
+      { error: "Failed to fetch airports", },
+      { status: 500 }
     );
   }
 }
+

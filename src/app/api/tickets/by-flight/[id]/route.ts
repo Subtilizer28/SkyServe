@@ -1,9 +1,8 @@
 import { getTicketsByFlight } from "@/server/handlers/ticket";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const flightId = searchParams.get("flightId");
+export async function GET(req: Request, { params }: { params: { id: string } }) {
+  const { id: flightId } = params;
 
   if (!flightId) {
     return NextResponse.json({ error: "Flight ID is required" }, { status: 400 });

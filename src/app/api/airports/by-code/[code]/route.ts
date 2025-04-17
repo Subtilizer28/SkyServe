@@ -1,15 +1,17 @@
-// src/app/api/airports/by-code/[code]/route.ts
 import { getAirportByCode } from "@/server/handlers/airport";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { code: string } }
+  _: NextRequest,
+  context: { params: { code: string } },
 ) {
-  const code = params.code;
+  const code = context.params.code;
 
   if (!code) {
-    return NextResponse.json({ error: "Airport code is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Airport code is required" },
+      { status: 400 },
+    );
   }
 
   const airport = await getAirportByCode(code);
